@@ -1,0 +1,33 @@
+{
+  "link.title.Docs": {
+    "message": "Docs",
+    "description": "The title of the footer links column with title=Docs in the footer"
+  },
+  "link.title.Social Profiles": {
+    "message": "Social Profiles",
+    "description": "The title of the footer links column with title=Social Profiles in the footer"
+  },
+  "link.title.More": {
+    "message": "More",
+    "description": "The title of the footer links column with title=More in the footer"
+  },
+  "link.item.label.Introduction": {
+    "message": "Introduction",
+    "description": "The label of footer link with label=Introduction linking to /docs/introduction/intro"
+  },
+
+  
+  "link.item.label.LinkenIN": {
+    "message": "LinkenIN",
+    "description": "The label of footer link with label=LinkenIN linking to https://www.linkedin.com/in/subhana-rameez-54b76a278/"
+  },
+  
+  "link.item.label.GitHub": {
+    "message": "GitHub",
+    "description": "The label of footer link with label=GitHub linking to https://github.com/subhana123"
+  },
+  "copyright": {
+    "message": "Copyright � 2025 Physical AI & Humanoid Robotics Textbook, Built with ❤️ by Subhana Rameez.",
+    "description": "The footer copyright"
+  }
+}

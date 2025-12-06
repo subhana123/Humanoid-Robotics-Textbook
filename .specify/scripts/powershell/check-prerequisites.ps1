@@ -1,148 +1,50 @@
-#!/usr/bin/env pwsh
+<!-- Sync Impact Report:
+Version change: 1.0.0 → 1.1.0
+Modified principles:
+  - Interdisciplinary Collaboration (new)
+  - Ethical AI Development (new)
+  - Robustness & Safety Engineering (new)
+  - Human-Robot Interaction Design (new)
+  - Continuous Learning & Adaptation (new)
+Added sections:
+  - Technical Standards
+  - Research & Development Workflow
+Removed sections:
+  - None
+Templates requiring updates:
+  - .specify/templates/plan-template.md (⚠ pending)
+  - .specify/templates/spec-template.md (⚠ pending)
+  - .specify/templates/tasks-template.md (⚠ pending)
+  - .specify/templates/commands/*.md (⚠ pending)
+Follow-up TODOs:
+  - None
+-->
+# Physical AI & Humanoid Robotics Constitution
 
-# Consolidated prerequisite checking script (PowerShell)
-#
-# This script provides unified prerequisite checking for Spec-Driven Development workflow.
-# It replaces the functionality previously spread across multiple scripts.
-#
-# Usage: ./check-prerequisites.ps1 [OPTIONS]
-#
-# OPTIONS:
-#   -Json               Output in JSON format
-#   -RequireTasks       Require tasks.md to exist (for implementation phase)
-#   -IncludeTasks       Include tasks.md in AVAILABLE_DOCS list
-#   -PathsOnly          Only output path variables (no validation)
-#   -Help, -h           Show help message
+## Core Principles
 
-[CmdletBinding()]
-param(
-    [switch]$Json,
-    [switch]$RequireTasks,
-    [switch]$IncludeTasks,
-    [switch]$PathsOnly,
-    [switch]$Help
-)
+### I. Interdisciplinary Collaboration
+This principle stresses the importance of collaboration across AI, robotics, biomechanics, cognitive science, and ethics. Successful development in Physical AI and Humanoid Robotics requires integrating diverse expertise to address complex challenges comprehensively.
 
-$ErrorActionPreference = 'Stop'
+### II. Ethical AI Development
+This principle highlights the necessity of ethical standards, human well-being, autonomy, privacy, fairness, bias detection, transparency, and accountability. All development must prioritize the responsible creation and deployment of AI systems, ensuring they serve humanity beneficially and justly.
 
-# Show help if requested
-if ($Help) {
-    Write-Output @"
-Usage: check-prerequisites.ps1 [OPTIONS]
+### III. Robustness & Safety Engineering
+This principle emphasizes engineering for extreme robustness, reliability, and safety in unpredictable environments, including rigorous risk assessment and testing. Physical AI systems must be designed to operate dependably and securely, minimizing risks to users and the environment.
 
-Consolidated prerequisite checking for Spec-Driven Development workflow.
+### IV. Human-Robot Interaction Design
+This principle focuses on intuitive, natural, and trustworthy human-robot interaction, considering psychological, social, and cultural factors. Designing for seamless and acceptable interaction is crucial for the successful integration of humanoid robotics into society.
 
-OPTIONS:
-  -Json               Output in JSON format
-  -RequireTasks       Require tasks.md to exist (for implementation phase)
-  -IncludeTasks       Include tasks.md in AVAILABLE_DOCS list
-  -PathsOnly          Only output path variables (no prerequisite validation)
-  -Help, -h           Show this help message
+### V. Continuous Learning & Adaptation
+This principle includes the concept of systems designed to continuously learn, adapt, and improve through real-world interaction. Physical AI systems must possess the capability to evolve their understanding and performance over time, responding to new data and experiences.
 
-EXAMPLES:
-  # Check task prerequisites (plan.md required)
-  .\check-prerequisites.ps1 -Json
-  
-  # Check implementation prerequisites (plan.md + tasks.md required)
-  .\check-prerequisites.ps1 -Json -RequireTasks -IncludeTasks
-  
-  # Get feature paths only (no validation)
-  .\check-prerequisites.ps1 -PathsOnly
+## Technical Standards
+Development must leverage advanced simulation environments for testing and validation, along with robust hardware-software co-design principles to ensure optimal performance and integration of physical and digital components.
 
-"@
-    exit 0
-}
+## Research & Development Workflow
+The workflow must be iterative and hypothesis-driven, encouraging rapid prototyping and experimentation. It should also include regular peer review and mechanisms for effective knowledge transfer across teams and disciplines.
 
-# Source common functions
-. "$PSScriptRoot/common.ps1"
+## Governance
+This constitution supersedes all other practices. Amendments require thorough documentation, multi-stakeholder approval, and a clear migration plan. All development and operational practices must align with the core principles outlined herein. Compliance will be reviewed annually to ensure ongoing adherence to ethical, safety, and performance standards.
 
-# Get feature paths and validate branch
-$paths = Get-FeaturePathsEnv
-
-if (-not (Test-FeatureBranch -Branch $paths.CURRENT_BRANCH -HasGit:$paths.HAS_GIT)) { 
-    exit 1 
-}
-
-# If paths-only mode, output paths and exit (support combined -Json -PathsOnly)
-if ($PathsOnly) {
-    if ($Json) {
-        [PSCustomObject]@{
-            REPO_ROOT    = $paths.REPO_ROOT
-            BRANCH       = $paths.CURRENT_BRANCH
-            FEATURE_DIR  = $paths.FEATURE_DIR
-            FEATURE_SPEC = $paths.FEATURE_SPEC
-            IMPL_PLAN    = $paths.IMPL_PLAN
-            TASKS        = $paths.TASKS
-        } | ConvertTo-Json -Compress
-    } else {
-        Write-Output "REPO_ROOT: $($paths.REPO_ROOT)"
-        Write-Output "BRANCH: $($paths.CURRENT_BRANCH)"
-        Write-Output "FEATURE_DIR: $($paths.FEATURE_DIR)"
-        Write-Output "FEATURE_SPEC: $($paths.FEATURE_SPEC)"
-        Write-Output "IMPL_PLAN: $($paths.IMPL_PLAN)"
-        Write-Output "TASKS: $($paths.TASKS)"
-    }
-    exit 0
-}
-
-# Validate required directories and files
-if (-not (Test-Path $paths.FEATURE_DIR -PathType Container)) {
-    Write-Output "ERROR: Feature directory not found: $($paths.FEATURE_DIR)"
-    Write-Output "Run /sp.specify first to create the feature structure."
-    exit 1
-}
-
-if (-not (Test-Path $paths.IMPL_PLAN -PathType Leaf)) {
-    Write-Output "ERROR: plan.md not found in $($paths.FEATURE_DIR)"
-    Write-Output "Run /sp.plan first to create the implementation plan."
-    exit 1
-}
-
-# Check for tasks.md if required
-if ($RequireTasks -and -not (Test-Path $paths.TASKS -PathType Leaf)) {
-    Write-Output "ERROR: tasks.md not found in $($paths.FEATURE_DIR)"
-    Write-Output "Run /sp.tasks first to create the task list."
-    exit 1
-}
-
-# Build list of available documents
-$docs = @()
-
-# Always check these optional docs
-if (Test-Path $paths.RESEARCH) { $docs += 'research.md' }
-if (Test-Path $paths.DATA_MODEL) { $docs += 'data-model.md' }
-
-# Check contracts directory (only if it exists and has files)
-if ((Test-Path $paths.CONTRACTS_DIR) -and (Get-ChildItem -Path $paths.CONTRACTS_DIR -ErrorAction SilentlyContinue | Select-Object -First 1)) { 
-    $docs += 'contracts/' 
-}
-
-if (Test-Path $paths.QUICKSTART) { $docs += 'quickstart.md' }
-
-# Include tasks.md if requested and it exists
-if ($IncludeTasks -and (Test-Path $paths.TASKS)) { 
-    $docs += 'tasks.md' 
-}
-
-# Output results
-if ($Json) {
-    # JSON output
-    [PSCustomObject]@{ 
-        FEATURE_DIR = $paths.FEATURE_DIR
-        AVAILABLE_DOCS = $docs 
-    } | ConvertTo-Json -Compress
-} else {
-    # Text output
-    Write-Output "FEATURE_DIR:$($paths.FEATURE_DIR)"
-    Write-Output "AVAILABLE_DOCS:"
-    
-    # Show status of each potential document
-    Test-FileExists -Path $paths.RESEARCH -Description 'research.md' | Out-Null
-    Test-FileExists -Path $paths.DATA_MODEL -Description 'data-model.md' | Out-Null
-    Test-DirHasFiles -Path $paths.CONTRACTS_DIR -Description 'contracts/' | Out-Null
-    Test-FileExists -Path $paths.QUICKSTART -Description 'quickstart.md' | Out-Null
-    
-    if ($IncludeTasks) {
-        Test-FileExists -Path $paths.TASKS -Description 'tasks.md' | Out-Null
-    }
-}
+**Version**: 1.1.0 | **Ratified**: 2025-01-01 | **Last Amended**: 2025-11-28
